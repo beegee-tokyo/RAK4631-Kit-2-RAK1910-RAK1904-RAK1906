@@ -5,6 +5,8 @@
 ----
 
 # RAK4631-Kit-2-RAK1910-RAK1904-RAK1906
+| <img src="./assets/RAK-Whirls.png" alt="Modules" width="150"> | <img src="./assets/rakstar.jpg" alt="RAKstar" width="100"> |    
+| :-: | :-: |     
 This is an example code for WisBlock GNSS tracker with RAK1910 GNSS module, RAK1904 ACC sensor and RAK1906 environment sensor. 
 
 ## _REMARK 1_
@@ -44,7 +46,10 @@ The libraries are all listed in the **`platformio.ini`** and are automatically i
 ----
 
 # Setting up LoRaWAN credentials
-The LoRaWAN credentials are defined in [include/main.h](./include/main.h). But this code supports 2 other methods to change the LoRaWAN credentials on the fly:
+The LoRaWAN settings can be defined in three different ways. 
+- Over BLE with [My nRF52 Toolbox](https://play.google.com/store/apps/details?id=tk.giesecke.my_nrf52_tb)
+- Over USB with [AT Commands](./AT-Commands.md)
+- Hardcoded in the sources (_**ABSOLUTELY NOT RECOMMENDED**_)
 
 ## 1) Setup over BLE
 Using the [My nRF52 Toolbox](https://play.google.com/store/apps/details?id=tk.giesecke.my_nrf52_tb) you can connect to the WisBlock over BLE and setup all LoRaWAN parameters like
@@ -64,6 +69,39 @@ A detailed manual for the AT commands are in [AT-Commands.md](./AT-Commands.md)
 
 ## _REMARK_
 The AT command format used here is _**NOT**_ compatible with the RAK5205/RAK7205 AT commands.
+
+## 3) Hardcoded LoRaWAN settings
+`void api_set_credentials(void);`
+This informs the API that hard coded LoRaWAN credentials will be used. If credentials are sent over USB or from My nRF Toolbox, the received credentials will be ignored. _**It is strongly suggest NOT TO USE hard coded credentials to avoid duplicate node definitions**_    
+If hard coded LoRaWAN credentials are used, they must be set before this function is called. Example:    
+```c++
+g_lorawan_settings.auto_join = false;							// Flag if node joins automatically after reboot
+g_lorawan_settings.otaa_enabled = true;							// Flag for OTAA or ABP
+memcpy(g_lorawan_settings.node_device_eui, node_device_eui, 8); // OTAA Device EUI MSB
+memcpy(g_lorawan_settings.node_app_eui, node_app_eui, 8);		// OTAA Application EUI MSB
+memcpy(g_lorawan_settings.node_app_key, node_app_key, 16);		// OTAA Application Key MSB
+memcpy(g_lorawan_settings.node_nws_key, node_nws_key, 16);		// ABP Network Session Key MSB
+memcpy(g_lorawan_settings.node_apps_key, node_apps_key, 16);	// ABP Application Session key MSB
+g_lorawan_settings.node_dev_addr = 0x26021FB4;					// ABP Device Address MSB
+g_lorawan_settings.send_repeat_time = 120000;					// Send repeat time in milliseconds: 2 * 60 * 1000 => 2 minutes
+g_lorawan_settings.adr_enabled = false;							// Flag for ADR on or off
+g_lorawan_settings.public_network = true;						// Flag for public or private network
+g_lorawan_settings.duty_cycle_enabled = false;					// Flag to enable duty cycle (validity depends on Region)
+g_lorawan_settings.join_trials = 5;								// Number of join retries
+g_lorawan_settings.tx_power = 0;								// TX power 0 .. 15 (validity depends on Region)
+g_lorawan_settings.data_rate = 3;								// Data rate 0 .. 15 (validity depends on Region)
+g_lorawan_settings.lora_class = 0;								// LoRaWAN class 0: A, 2: C, 1: B is not supported
+g_lorawan_settings.subband_channels = 1;						// Subband channel selection 1 .. 9
+g_lorawan_settings.app_port = 2;								// Data port to send data
+g_lorawan_settings.confirmed_msg_enabled = LMH_UNCONFIRMED_MSG; // Flag to enable confirmed messages
+g_lorawan_settings.resetRequest = true;							// Command from BLE to reset device
+g_lorawan_settings.lora_region = LORAMAC_REGION_AS923_3;		// LoRa region
+// Inform API about hard coded LoRaWAN settings
+api_set_credentials();
+```
+
+_**REMARK!**_    
+Hard coded credentials must be set in `void setup_app(void)`!
 
 ----
 
@@ -114,5 +152,6 @@ lib_deps =
 	mikalhart/TinyGPSPlus
 	adafruit/Adafruit BME680 Library
 	sparkfun/SparkFun LIS3DH Arduino Library
+	https://github.com/beegee-tokyo/WisBlock-API
 extra_scripts = pre:rename.py
 ```

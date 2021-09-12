@@ -17,6 +17,9 @@
 /** Add you required includes after Arduino.h */
 #include <Wire.h>
 
+/** Include the SX126x-API */
+#include <WisBlock-API.h> // Click to install library: http://librarymanager/All#WisBlock-API
+
 /** Application function definitions */
 void setup_app(void);
 bool init_app(void);

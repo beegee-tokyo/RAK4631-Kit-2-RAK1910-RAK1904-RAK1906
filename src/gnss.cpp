@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2020
  * 
  */
-#include "main.h"
+#include "app.h"
 
 // The GNSS object
 TinyGPSPlus my_gnss;
@@ -93,9 +93,9 @@ bool poll_gnss(void)
 					has_pos = true;
 					latitude = my_gnss.location.lat() * 10000000;
 					longitude = my_gnss.location.lng() * 10000000;
-					if (ble_uart_is_connected)
+					if (g_ble_uart_is_connected)
 					{
-						ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
+						g_ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
 					}
 				}
 
@@ -103,9 +103,9 @@ bool poll_gnss(void)
 				// {
 				// 	has_hdop = true;
 				// 	double hdop_d = my_gnss.hdop.hdop();
-				// 	if (ble_uart_is_connected)
+				// 	if (g_ble_uart_is_connected)
 				// 	{
-				// 		ble_uart.printf("hdop = %0.2f\n", hdop_d);
+				// 		g_ble_uart.printf("hdop = %0.2f\n", hdop_d);
 				// 	}
 				// 	hdop = hdop_d;
 				// }
@@ -114,19 +114,19 @@ bool poll_gnss(void)
 				// 	has_pos = true;
 				// 	latitude = my_gnss.location.lat() * 10000000;
 				// 	longitude = my_gnss.location.lng() * 10000000;
-				// 	if (ble_uart_is_connected)
+				// 	if (g_ble_uart_is_connected)
 				// 	{
-				// 		ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
+				// 		g_ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
 				// 	}
 				// }
 				else if (my_gnss.altitude.isUpdated() && my_gnss.altitude.isValid())
 				{
 					has_alt = true;
 					altitude = my_gnss.altitude.meters() * 1000;
-					if (ble_uart_is_connected)
+					if (g_ble_uart_is_connected)
 					{
-						ble_uart.printf("Alt: %.2f\n", altitude / 1000.0);
-						ble_uart.printf("Alt: %.2f\n", my_gnss.altitude.meters());
+						g_ble_uart.printf("Alt: %.2f\n", altitude / 1000.0);
+						g_ble_uart.printf("Alt: %.2f\n", my_gnss.altitude.meters());
 					}
 				}
 			}
@@ -159,11 +159,11 @@ bool poll_gnss(void)
 		// longitude = -349021580;
 		// altitude = 156024;
 
-		if (ble_uart_is_connected)
+		if (g_ble_uart_is_connected)
 		{
-			ble_uart.printf("Fixtype: %d\n", hdop);
-			ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
-			ble_uart.printf("Alt: %.2f\n", altitude / 1000.0);
+			g_ble_uart.printf("Fixtype: %d\n", hdop);
+			g_ble_uart.printf("Lat: %.4f Lon: %.4f\n", latitude / 10000000.0, longitude / 10000000.0);
+			g_ble_uart.printf("Alt: %.2f\n", altitude / 1000.0);
 		}
 		pos_union.val32 = latitude / 1000;
 		g_tracker_data.lat_1 = pos_union.val8[2];
@@ -186,9 +186,9 @@ bool poll_gnss(void)
 		digitalWrite(LED_CONN, LOW);
 #endif
 		MYLOG("GNSS", "No valid location found");
-		if (ble_uart_is_connected)
+		if (g_ble_uart_is_connected)
 		{
-			ble_uart.println("No valid location found");
+			g_ble_uart.println("No valid location found");
 		}
 		last_read_ok = false;
 		delay(1000);
