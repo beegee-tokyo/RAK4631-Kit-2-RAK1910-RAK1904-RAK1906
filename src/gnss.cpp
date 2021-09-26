@@ -13,6 +13,14 @@
 // The GNSS object
 TinyGPSPlus my_gnss;
 
+/** LoRa task handle */
+TaskHandle_t gnss_task_handle;
+/** GPS reading task */
+void gnss_task(void *pvParameters);
+
+/** Semaphore for GNSS aquisition task */
+SemaphoreHandle_t g_gnss_sem;
+
 /** GNSS polling function */
 bool poll_gnss(void);
 
@@ -78,8 +86,24 @@ bool poll_gnss(void)
 	int32_t altitude = 0;
 	uint8_t hdop = 0;
 
-	Serial.println("=============================================");
-	while ((millis() - time_out) < 60000)
+	time_t check_limit = 90000;
+
+	if (g_lorawan_settings.send_repeat_time == 0)
+	{
+		check_limit = 90000;
+	}
+	else if (g_lorawan_settings.send_repeat_time <= 90000)
+	{
+		check_limit = g_lorawan_settings.send_repeat_time / 2;
+	}
+	else
+	{
+		check_limit = 90000;
+	}
+
+	MYLOG("GNSS", "GNSS timeout %ld", (long int)check_limit);
+
+	while ((millis() - time_out) < check_limit)
 	{
 		while (Serial1.available() > 0)
 		{
@@ -143,8 +167,6 @@ bool poll_gnss(void)
 		}
 	}
 
-	Serial.println("\n=============================================");
-
 	// Shut down Serial 1 to save power
 	Serial1.end();
 
@@ -203,4 +225,25 @@ bool poll_gnss(void)
 		return true;
 	}
 	return false;
+}
+
+void gnss_task(void *pvParameters)
+{
+	MYLOG("GNSS", "GNSS Task started");
+
+	while (1)
+	{
+		if (xSemaphoreTake(g_gnss_sem, portMAX_DELAY) == pdTRUE)
+		{
+			MYLOG("GNSS", "GNSS Task wake up");
+			// Get location
+			poll_gnss();
+			if (g_task_sem != NULL)
+			{
+				g_task_event_type |= GNSS_FIN;
+				xSemaphoreGiveFromISR(g_task_sem, &g_higher_priority_task_woken);
+			}
+			MYLOG("GNSS", "GNSS Task finished");
+		}
+	}
 }

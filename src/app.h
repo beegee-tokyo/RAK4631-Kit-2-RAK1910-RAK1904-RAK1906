@@ -17,8 +17,26 @@
 /** Add you required includes after Arduino.h */
 #include <Wire.h>
 
-/** Include the SX126x-API */
+/** Include the WisBlock-API */
 #include <WisBlock-API.h> // Click to install library: http://librarymanager/All#WisBlock-API
+
+// Debug output set to 0 to disable app debug output
+#ifndef MY_DEBUG
+#define MY_DEBUG 0
+#endif
+
+#if MY_DEBUG > 0
+#define MYLOG(tag, ...)           \
+	do                            \
+	{                             \
+		if (tag)                  \
+			PRINTF("[%s] ", tag); \
+		PRINTF(__VA_ARGS__);      \
+		PRINTF("\n");             \
+	} while (0)
+#else
+#define MYLOG(...)
+#endif
 
 /** Application function definitions */
 void setup_app(void);
@@ -30,6 +48,8 @@ void lora_data_handler(void);
 /** Examples for application events */
 #define ACC_TRIGGER 0b1000000000000000
 #define N_ACC_TRIGGER 0b0111111111111111
+#define GNSS_FIN      0b0100000000000000
+#define N_GNSS_FIN    0b1011111111111111
 
 /** Application stuff */
 extern BaseType_t g_higher_priority_task_woken;
@@ -52,6 +72,9 @@ void read_acc(void);
 #include "TinyGPS++.h"
 bool init_gnss(void);
 bool poll_gnss(void);
+void gnss_task(void *pvParameters);
+extern SemaphoreHandle_t g_gnss_sem;
+extern TaskHandle_t gnss_task_handle;
 
 // LoRaWan functions
 struct tracker_data_s
