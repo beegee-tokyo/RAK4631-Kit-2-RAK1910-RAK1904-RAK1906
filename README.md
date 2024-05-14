@@ -15,7 +15,7 @@ The WisBlock Kit 2 comes without the RAK1906. But if you want full RAK5205/7205 
 - [RAK1906](https://store.rakwireless.com/collections/wisblock-sensor/products/rak1906-bme680-environment-sensor)
 
 ## _REMARK 2_
-This example is using my [WisBlock API](https://github.com/beegee-tokyo/WisBlock-API) which helps to create low power consumption application and taking the load to handle communications from your shoulder.
+This example is using my [WisBlock API V2](https://github.com/beegee-tokyo/WisBlock-API-V2) which helps to create low power consumption application and taking the load to handle communications from your shoulder.
 
 ----
 
@@ -39,7 +39,7 @@ The application does switch off the GPS module and the MCU and LoRa transceiver 
 - [TinyGPSPlus](https://platformio.org/lib/show/1655/TinyGPSPlus)
 - [SparkFun LIS3DH Arduino Library](https://platformio.org/lib/show/1401/SparkFun%20LIS3DH%20Arduino%20Library)
 - [Adafruit BME680 Library](https://platformio.org/lib/show/1922/Adafruit%20BME680%20Library) (optional)
-- [WisBlock-API](https://platformio.org/lib/show/12807/WisBlock-API)
+- [WisBlock-API-V2](https://platformio.org/lib/show/12807/WisBlock-API-V2)
 
 ## _REMARK_
 The libraries are all listed in the **`platformio.ini`** and are automatically installed when the project is compiled.
@@ -169,6 +169,6 @@ lib_deps =
 	mikalhart/TinyGPSPlus
 	adafruit/Adafruit BME680 Library
 	sparkfun/SparkFun LIS3DH Arduino Library
-	beegee-tokyo/WisBlock-API
+	beegee-tokyo/WisBlock-API-V2
 extra_scripts = pre:rename.py
 ```

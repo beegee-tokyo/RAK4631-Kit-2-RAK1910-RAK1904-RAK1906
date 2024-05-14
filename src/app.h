@@ -18,7 +18,7 @@
 #include <Wire.h>
 
 /** Include the WisBlock-API */
-#include <WisBlock-API.h> // Click to install library: http://librarymanager/All#WisBlock-API
+#include <WisBlock-API-V2.h> // Click to install library: http://librarymanager/All#WisBlock-API-V2
 
 // Debug output set to 0 to disable app debug output
 #ifndef MY_DEBUG
